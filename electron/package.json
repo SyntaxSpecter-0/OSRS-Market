@@ -1,0 +1,21 @@
+{
+  "name": "ledger-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^32.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.claymaver.ledger",
+    "productName": "Ledger",
+    "win": { "target": "nsis" },
+    "mac": { "target": "dmg" },
+    "linux": { "target": ["AppImage", "deb"] }
+  }
+}

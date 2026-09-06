@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'IM Fell English';
+  src: local('IM Fell English');
+}
+
+body {
+  background-color: #1b1712;
+  color: #e8dcc2;
+}
+
+/* Thin bronze scrollbar to match the ledger theme instead of default chrome */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #241f19;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3226;
+  border-radius: 0;
+}
