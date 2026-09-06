@@ -7,8 +7,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { useWatchlistFlips } from '@/hooks/useWatchlistFlips';
 import { AddItemSearch } from '@/components/AddItemSearch';
 import { FlipTable } from '@/components/FlipTable';
-import { enablePushNotifications } from '@/lib/firebase/push';
 import { AlertRuleForm } from '@/components/AlertRuleForm';
+import { enablePushNotifications } from '@/lib/firebase/push';
 
 export default function DashboardPage() {
   const { user, loading } = useAuth();
