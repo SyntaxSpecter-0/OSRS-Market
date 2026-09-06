@@ -16,7 +16,7 @@ browser, an installable PWA (Android/iOS), and a desktop Electron wrapper.
 
 ## Project layout
 
-src/app/ Next.js pages (login, dashboard)
+``src/app/ Next.js pages (login, dashboard)
 src/components/ Watchlist search, flip table, alert rule form
 src/hooks/ useAuth (Supabase), useWatchlistFlips (Postgres + Realtime)
 src/lib/supabase/ Browser/server clients, item search (ILIKE)
@@ -27,7 +27,7 @@ supabase/schema.sql Tables, RLS policies, and pg_cron schedules
 supabase/functions/ Edge Functions (Deno): poll-prices, refresh-mapping
 electron/ Desktop shell (electron-builder config)
 public/manifest.json PWA manifest (installable on Android/iOS/desktop)
-public/firebase-messaging-sw.js Background push service worker
+public/firebase-messaging-sw.js Background push service worker``
 
 
 The GE-tax/margin math and the OSRS Wiki API client each exist in two
