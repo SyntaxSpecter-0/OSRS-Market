@@ -7,7 +7,7 @@ browser, an installable PWA (Android/iOS), and a desktop Electron wrapper.
 ## Stack
 
 - **Frontend:** Next.js (App Router) + Tailwind, deployed to Vercel
-- **Backend:** Supabase — Postgres (data), Supabase Auth (Google sign-in),
+- **Backend:** Supabase — Postgres (data), Supabase Auth (magic link email sign-in),
   Edge Functions + `pg_cron` (scheduled price polling + alert evaluation)
 - **Push delivery only:** Firebase Cloud Messaging (free Spark plan — no
   Blaze/billing needed, since scheduling lives in Supabase, not Firebase)
@@ -69,7 +69,12 @@ any tax-rate or API changes into both.
    calls first.
 4. Enable Realtime on the `price_ticks` table (Database -> Replication) so
    the dashboard updates live.
-5. Enable Google as an Auth provider (Authentication -> Providers).
+5. Email (magic link) sign-in is enabled by default — no OAuth app to
+   register. You do need to whitelist your callback URL, though: in
+   Authentication -> URL Configuration, set Site URL to your deployed
+   app's URL, and add `<your-app-url>/auth/callback` (and
+   `http://localhost:3000/auth/callback` for local dev) to Redirect URLs.
+   Supabase rejects magic-link redirects to anything not on this list.
 6. Deploy the Edge Functions: `supabase functions deploy poll-prices` and
    `supabase functions deploy refresh-mapping`.
 7. Set Edge Function secrets: `supabase secrets set OSRS_API_USER_AGENT="…" FCM_PROJECT_ID="…" FCM_CLIENT_EMAIL="…" FCM_PRIVATE_KEY="…"`

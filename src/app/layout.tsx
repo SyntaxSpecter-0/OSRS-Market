@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Ledger — OSRS Flip Tracker',
+  title: 'Ledger - OSRS Flip Tracker',
   description: 'Real-time Grand Exchange margins, momentum, and alerts.',
   manifest: '/manifest.json',
 };

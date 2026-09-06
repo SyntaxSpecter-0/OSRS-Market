@@ -56,7 +56,7 @@ export function FlipTable({
         {sorted.length === 0 && (
           <tr>
             <td colSpan={7} className="py-8 text-center text-ledger-muted">
-              Nothing on your watchlist yet — search for an item above to start tracking it.
+              Nothing on your watchlist yet. Search for an item above to start tracking it.
             </td>
           </tr>
         )}

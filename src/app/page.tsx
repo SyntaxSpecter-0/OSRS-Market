@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -8,17 +8,22 @@ import { useAuth } from '@/hooks/useAuth';
 export default function HomePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
   useEffect(() => {
     if (!loading && user) router.replace('/dashboard');
   }, [loading, user, router]);
 
-  async function handleSignIn() {
+  async function handleSendLink(e: React.FormEvent) {
+    e.preventDefault();
+    setStatus('sending');
     const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/dashboard` },
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
     });
+    setStatus(error ? 'error' : 'sent');
   }
 
   return (
@@ -30,12 +35,33 @@ export default function HomePage() {
           you're watching.
         </p>
       </div>
-      <button
-        onClick={handleSignIn}
-        className="border border-ledger-bronze px-6 py-3 text-ledger-parchment transition hover:bg-ledger-bronze hover:text-ledger-bg"
-      >
-        Sign in with Google
-      </button>
+
+      {status === 'sent' ? (
+        <p className="max-w-sm text-ledger-parchment">
+          Check your email for a sign-in link. You can close this tab.
+        </p>
+      ) : (
+        <form onSubmit={handleSendLink} className="flex w-full max-w-sm flex-col gap-3">
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            className="border border-ledger-line bg-ledger-panel px-3 py-2 text-ledger-parchment placeholder:text-ledger-muted focus:border-ledger-bronze focus:outline-none"
+          />
+          <button
+            type="submit"
+            disabled={status === 'sending'}
+            className="border border-ledger-bronze px-6 py-3 text-ledger-parchment transition hover:bg-ledger-bronze hover:text-ledger-bg disabled:opacity-50"
+          >
+            {status === 'sending' ? 'Sending…' : 'Send sign-in link'}
+          </button>
+          {status === 'error' && (
+            <p className="text-sell text-sm">Something went wrong. Try again.</p>
+          )}
+        </form>
+      )}
     </main>
   );
 }
