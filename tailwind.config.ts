@@ -5,23 +5,31 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Palette pulled from the GE interface itself: parchment ledger paper,
-        // bronze rule lines, a mossy "buy" green and a rust "sell" red —
-        // not a generic SaaS dashboard palette.
+        // OSRS interface palette: oak-brown panels, a near-black recessed
+        // background, and the game's signature orange/yellow/white text
+        // hierarchy (orange for interface labels, yellow for gp amounts,
+        // white for item names). Not Jagex's actual assets, just the same
+        // color language.
         ledger: {
-          bg: '#1b1712',
-          panel: '#241f19',
-          line: '#3a3226',
-          parchment: '#e8dcc2',
-          muted: '#a89a7d',
-          bronze: '#b08a4e',
+          bg: '#3e3529',
+          panel: '#26211a',
+          line: '#5a4a32',
+          parchment: '#fff5e0',
+          muted: '#a89878',
+          bronze: '#ff981f',
         },
-        buy: '#5c8a56',
-        sell: '#a3503a',
+        buy: '#3ddc46',
+        sell: '#ff3232',
+        gp: '#ffff00',
       },
       fontFamily: {
-        display: ['"IM Fell English"', 'Georgia', 'serif'],
+        display: ['"MedievalSharp"', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
+      },
+      boxShadow: {
+        // A beveled inset border, the classic "old game GUI panel" look:
+        // a light top-left edge and dark bottom-right edge on a dark panel.
+        bevel: 'inset 1px 1px 0 rgba(255,255,255,0.12), inset -1px -1px 0 rgba(0,0,0,0.55)',
       },
     },
   },

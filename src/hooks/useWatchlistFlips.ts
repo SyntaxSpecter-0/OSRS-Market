@@ -17,10 +17,13 @@ export interface WatchedFlip {
 
 /**
  * Loads the user's watchlist, joins in each item's most recent price tick,
- * and subscribes to Supabase Realtime on `price_ticks` so the table
- * updates live as the poller writes new ticks every minute. Realtime must
- * be enabled on `price_ticks` in the Supabase dashboard (Database ->
- * Replication) for the live-update part to work.
+ * and subscribes to Supabase Realtime on two tables:
+ *   - price_ticks: so numbers update live as the poller writes new ticks
+ *   - watchlist_items (filtered to this user): so adding/removing an item
+ *     from another tab, device, or component shows up immediately, with
+ *     no page refresh needed
+ * Realtime must be enabled on BOTH tables in the Supabase dashboard
+ * (Database -> Replication) for this to work.
  */
 export function useWatchlistFlips(uid: string | undefined) {
   const supabase = createClient();
@@ -34,6 +37,18 @@ export function useWatchlistFlips(uid: string | undefined) {
         .eq('item_id', itemId)
         .order('fetched_at', { ascending: false })
         .limit(1)
+        .maybeSingle();
+      return data;
+    },
+    [supabase]
+  );
+
+  const loadItemMeta = useCallback(
+    async (itemId: number) => {
+      const { data } = await supabase
+        .from('items')
+        .select('name, buy_limit')
+        .eq('id', itemId)
         .maybeSingle();
       return data;
     },
@@ -62,7 +77,7 @@ export function useWatchlistFlips(uid: string | undefined) {
     }
     load();
 
-    const channel = supabase
+    const priceChannel = supabase
       .channel('price-ticks-live')
       .on(
         'postgres_changes',
@@ -82,20 +97,49 @@ export function useWatchlistFlips(uid: string | undefined) {
       )
       .subscribe();
 
+    // Reacts to this user's own watchlist changing, from this tab, another
+    // tab, or another device, so a newly-added item appears without a
+    // manual page refresh.
+    const watchlistChannel = supabase
+      .channel(`watchlist-live-${uid}`)
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'watchlist_items', filter: `user_id=eq.${uid}` },
+        async (payload) => {
+          const itemId = payload.new.item_id as number;
+          const [meta, tick] = await Promise.all([loadItemMeta(itemId), loadLatestTick(itemId)]);
+          setFlips((prev) => ({
+            ...prev,
+            [itemId]: buildFlip(itemId, meta?.name ?? '…', meta?.buy_limit ?? 0, tick),
+          }));
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'DELETE', schema: 'public', table: 'watchlist_items', filter: `user_id=eq.${uid}` },
+        (payload) => {
+          const itemId = payload.old.item_id as number;
+          setFlips((prev) => {
+            const next = { ...prev };
+            delete next[itemId];
+            return next;
+          });
+        }
+      )
+      .subscribe();
+
     return () => {
       cancelled = true;
-      supabase.removeChannel(channel);
+      supabase.removeChannel(priceChannel);
+      supabase.removeChannel(watchlistChannel);
     };
-  }, [uid, supabase, loadLatestTick]);
+  }, [uid, supabase, loadLatestTick, loadItemMeta]);
 
   async function removeFromWatchlist(itemId: number) {
     if (!uid) return;
     await supabase.from('watchlist_items').delete().eq('user_id', uid).eq('item_id', itemId);
-    setFlips((prev) => {
-      const next = { ...prev };
-      delete next[itemId];
-      return next;
-    });
+    // No local state update needed here, the DELETE Realtime event above
+    // will remove it from state once Supabase confirms the delete.
   }
 
   return { flips: Object.values(flips), removeFromWatchlist };

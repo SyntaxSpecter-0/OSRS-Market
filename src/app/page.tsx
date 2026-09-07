@@ -29,7 +29,7 @@ export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-ledger-bg px-6 text-center">
       <div>
-        <h1 className="font-display text-5xl text-ledger-parchment">Ledger</h1>
+        <h1 className="font-display text-5xl text-ledger-bronze">Ledger</h1>
         <p className="mt-2 max-w-sm text-ledger-muted">
           Real-time Grand Exchange margins, momentum, and alerts for the items
           you're watching.
@@ -37,7 +37,7 @@ export default function HomePage() {
       </div>
 
       {status === 'sent' ? (
-        <p className="max-w-sm text-ledger-parchment">
+        <p className="osrs-panel max-w-sm px-4 py-3 text-ledger-parchment">
           Check your email for a sign-in link. You can close this tab.
         </p>
       ) : (
@@ -48,12 +48,12 @@ export default function HomePage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="you@example.com"
-            className="border border-ledger-line bg-ledger-panel px-3 py-2 text-ledger-parchment placeholder:text-ledger-muted focus:border-ledger-bronze focus:outline-none"
+            className="osrs-panel px-3 py-2 text-ledger-parchment placeholder:text-ledger-muted focus:outline-none focus:ring-1 focus:ring-ledger-bronze"
           />
           <button
             type="submit"
             disabled={status === 'sending'}
-            className="border border-ledger-bronze px-6 py-3 text-ledger-parchment transition hover:bg-ledger-bronze hover:text-ledger-bg disabled:opacity-50"
+            className="osrs-panel px-6 py-3 font-display text-lg text-ledger-bronze transition hover:text-ledger-parchment disabled:opacity-50"
           >
             {status === 'sending' ? 'Sending…' : 'Send sign-in link'}
           </button>

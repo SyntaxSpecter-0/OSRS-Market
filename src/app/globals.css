@@ -1,25 +1,43 @@
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: 'IM Fell English';
-  src: local('IM Fell English');
-}
-
 body {
-  background-color: #1b1712;
-  color: #e8dcc2;
+  background-color: #3e3529;
+  color: #fff5e0;
+  /* A faint diagonal weave, evokes a woven/stone interface texture rather
+     than a flat SaaS-dashboard background. */
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(0, 0, 0, 0.08) 0px,
+    rgba(0, 0, 0, 0.08) 1px,
+    transparent 1px,
+    transparent 8px
+  );
 }
 
-/* Thin bronze scrollbar to match the ledger theme instead of default chrome */
+/* Reusable "interface panel" look: dark recessed background, a hard outer
+   border, and a beveled inner highlight/shadow, the standard old-game-GUI
+   panel treatment. Apply alongside Tailwind utilities, e.g.
+   className="osrs-panel px-3 py-2". */
+.osrs-panel {
+  background-color: #26211a;
+  border: 2px solid #17130d;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 255, 255, 0.12),
+    inset -1px -1px 0 rgba(0, 0, 0, 0.55);
+}
+
+/* Thin bronze scrollbar to match the theme instead of default chrome */
 ::-webkit-scrollbar {
   width: 10px;
 }
 ::-webkit-scrollbar-track {
-  background: #241f19;
+  background: #26211a;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3a3226;
+  background: #5a4a32;
   border-radius: 0;
 }

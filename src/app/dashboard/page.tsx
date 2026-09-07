@@ -37,25 +37,27 @@ export default function DashboardPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-4xl px-6 py-10">
-      <header className="mb-8 flex items-center justify-between">
-        <h1 className="font-display text-3xl text-ledger-parchment">Ledger</h1>
+      <header className="osrs-panel mb-6 flex items-center justify-between px-4 py-3">
+        <h1 className="font-display text-3xl text-ledger-bronze">Ledger</h1>
         <div className="flex items-center gap-4 text-sm">
-          <button onClick={handleEnablePush} className="text-ledger-bronze hover:underline">
+          <button onClick={handleEnablePush} className="text-ledger-bronze hover:text-ledger-parchment hover:underline">
             Enable alerts
           </button>
-          <button onClick={handleSignOut} className="text-ledger-muted hover:underline">
+          <button onClick={handleSignOut} className="text-ledger-muted hover:text-ledger-parchment hover:underline">
             Sign out
           </button>
         </div>
       </header>
 
-      <div className="mb-6">
+      <div className="mb-4">
         <AddItemSearch uid={user.id} />
       </div>
 
       <AlertRuleForm uid={user.id} />
 
-      <FlipTable flips={flips} onRemove={removeFromWatchlist} />
+      <div className="osrs-panel px-4 py-3">
+        <FlipTable flips={flips} onRemove={removeFromWatchlist} />
+      </div>
     </main>
   );
 }

@@ -21,18 +21,18 @@ export function AlertRuleForm({ uid }: { uid: string }) {
   }
 
   return (
-    <div className="mb-6 flex items-center gap-3 text-sm text-ledger-muted">
+    <div className="osrs-panel mb-4 flex flex-wrap items-center gap-3 px-4 py-3 text-sm text-ledger-muted">
       <span>Alert me when any watchlist item's margin hits</span>
       <input
         type="number"
         value={threshold}
         onChange={(e) => setThreshold(Number(e.target.value))}
-        className="w-16 border border-ledger-line bg-ledger-panel px-2 py-1 text-ledger-parchment focus:border-ledger-bronze focus:outline-none"
+        className="osrs-panel w-16 px-2 py-1 text-ledger-parchment focus:outline-none focus:ring-1 focus:ring-ledger-bronze"
       />
       <span>%</span>
       <button
         onClick={handleSave}
-        className="border border-ledger-bronze px-3 py-1 text-ledger-bronze hover:bg-ledger-bronze hover:text-ledger-bg"
+        className="osrs-panel px-3 py-1 font-display text-ledger-bronze hover:text-ledger-parchment"
       >
         {saved ? 'Saved' : 'Save rule'}
       </button>

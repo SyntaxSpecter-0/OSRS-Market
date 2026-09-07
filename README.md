@@ -16,19 +16,20 @@ browser, an installable PWA (Android/iOS), and a desktop Electron wrapper.
 
 ## Project layout
 
-- src/app/ Next.js pages (login, dashboard)
-- src/components/ Watchlist search, flip table, alert rule form
-- src/hooks/ useAuth (Supabase), useWatchlistFlips (Postgres + Realtime)
-- src/lib/supabase/ Browser/server clients, item search (ILIKE)
-- src/lib/firebase/ Messaging-only client, push token registration
-- src/lib/osrs/ OSRS Wiki API client (TS, for future server-side use)
-- src/lib/signals/ Flip margin (GE-tax-aware) + momentum calculations
-- supabase/schema.sql Tables, RLS policies, and pg_cron schedules
-- supabase/functions/ Edge Functions (Deno): poll-prices, refresh-mapping
-- electron/ Desktop shell (electron-builder config)
-- public/manifest.json PWA manifest (installable on Android/iOS/desktop)
-- public/firebase-messaging-sw.js Background push service worker
-
+```
+src/app/                  Next.js pages (login, dashboard)
+src/components/           Watchlist search, flip table, alert rule form
+src/hooks/                useAuth (Supabase), useWatchlistFlips (Postgres + Realtime)
+src/lib/supabase/         Browser/server clients, item search (ILIKE)
+src/lib/firebase/         Messaging-only client, push token registration
+src/lib/osrs/             OSRS Wiki API client (TS, for future server-side use)
+src/lib/signals/          Flip margin (GE-tax-aware) + momentum calculations
+supabase/schema.sql       Tables, RLS policies, and pg_cron schedules
+supabase/functions/       Edge Functions (Deno): poll-prices, refresh-mapping
+electron/                 Desktop shell (electron-builder config)
+public/manifest.json      PWA manifest (installable on Android/iOS/desktop)
+public/firebase-messaging-sw.js  Background push service worker
+```
 
 The GE-tax/margin math and the OSRS Wiki API client each exist in two
 places, `src/lib/` for the Next.js app and `supabase/functions/_shared/`
@@ -71,11 +72,12 @@ share a bundler with Next.js. Mirror any tax-rate or API changes into both.
 
 ## Electron desktop app
 
+```
 cd electron
 npm install
-LEDGER_APP_URL=https://your-deployed-app.vercel.app npm start # dev
-npm run dist # build installers
-
+LEDGER_APP_URL=https://your-deployed-app.vercel.app npm start   # dev
+npm run dist                                                     # build installers
+```
 
 ## Not yet built
 

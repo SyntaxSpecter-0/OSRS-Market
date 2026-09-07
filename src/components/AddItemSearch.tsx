@@ -37,10 +37,10 @@ export function AddItemSearch({ uid }: { uid: string }) {
         value={query}
         onChange={(e) => handleChange(e.target.value)}
         placeholder="Add an item to your watchlist…"
-        className="w-full border border-ledger-line bg-ledger-panel px-3 py-2 text-ledger-parchment placeholder:text-ledger-muted focus:border-ledger-bronze focus:outline-none"
+        className="osrs-panel w-full px-3 py-2 text-ledger-parchment placeholder:text-ledger-muted focus:outline-none focus:ring-1 focus:ring-ledger-bronze"
       />
       {(results.length > 0 || searching) && (
-        <ul className="absolute z-10 mt-1 w-full border border-ledger-line bg-ledger-panel">
+        <ul className="osrs-panel absolute z-10 mt-1 w-full">
           {searching && <li className="px-3 py-2 text-sm text-ledger-muted">Searching…</li>}
           {results.map((item) => (
             <li key={item.id}>

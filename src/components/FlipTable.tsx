@@ -19,13 +19,13 @@ export function FlipTable({
   return (
     <table className="w-full border-collapse text-sm">
       <thead>
-        <tr className="border-b border-ledger-line text-left text-ledger-muted">
-          <th className="py-2 pr-4 font-normal">Item</th>
-          <th className="py-2 pr-4 font-normal">Buy</th>
-          <th className="py-2 pr-4 font-normal">Sell</th>
-          <th className="py-2 pr-4 font-normal">Net margin</th>
-          <th className="py-2 pr-4 font-normal">Margin %</th>
-          <th className="py-2 pr-4 font-normal">4h limit profit</th>
+        <tr className="border-b-2 border-ledger-line text-left">
+          <th className="py-2 pr-4 font-display text-base font-normal text-ledger-bronze">Item</th>
+          <th className="py-2 pr-4 font-display text-base font-normal text-ledger-bronze">Buy</th>
+          <th className="py-2 pr-4 font-display text-base font-normal text-ledger-bronze">Sell</th>
+          <th className="py-2 pr-4 font-display text-base font-normal text-ledger-bronze">Net margin</th>
+          <th className="py-2 pr-4 font-display text-base font-normal text-ledger-bronze">Margin %</th>
+          <th className="py-2 pr-4 font-display text-base font-normal text-ledger-bronze">4h limit profit</th>
           <th className="py-2 font-normal"></th>
         </tr>
       </thead>
@@ -35,11 +35,11 @@ export function FlipTable({
             <td className="py-2 pr-4 text-ledger-parchment">{f.name}</td>
             <td className="py-2 pr-4 text-buy">{gp(f.buyPrice)}</td>
             <td className="py-2 pr-4 text-sell">{gp(f.sellPrice)}</td>
-            <td className="py-2 pr-4">{gp(f.netMargin)}</td>
-            <td className="py-2 pr-4">
+            <td className="py-2 pr-4 text-gp">{gp(f.netMargin)}</td>
+            <td className="py-2 pr-4 text-ledger-parchment">
               {f.marginPct != null ? `${f.marginPct.toFixed(2)}%` : '—'}
             </td>
-            <td className="py-2 pr-4 text-ledger-muted">
+            <td className="py-2 pr-4 text-gp">
               {f.netMargin != null ? gp(f.netMargin * f.buyLimit) : '—'}
             </td>
             <td className="py-2">
