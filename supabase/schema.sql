@@ -101,10 +101,10 @@ select cron.schedule(
   '* * * * *',
   $$
   select net.http_post(
-    url := 'https://mvcktlriltrnxqmylanv.supabase.co/functions/v1/poll-prices',
+    url := 'https://<project>.supabase.co/functions/v1/poll-prices',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12Y2t0bHJpbHRybnhxbXlsYW52Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODYzNzE0MywiZXhwIjoyMTA0MjEzMTQzfQ.WuBQPk569n2IO2KmICvMvYJcBHD2BWv0TCqs4il5bZI'
+      'Authorization', 'Bearer <secret key>'
     ),
     body := '{}'::jsonb
   );
@@ -117,10 +117,10 @@ select cron.schedule(
   '0 3 * * *',
   $$
   select net.http_post(
-    url := 'https://mvcktlriltrnxqmylanv.supabase.co/functions/v1/refresh-mapping',
+    url := 'https://<project>.supabase.co/functions/v1/refresh-mapping',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im12Y2t0bHJpbHRybnhxbXlsYW52Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4ODYzNzE0MywiZXhwIjoyMTA0MjEzMTQzfQ.WuBQPk569n2IO2KmICvMvYJcBHD2BWv0TCqs4il5bZI'
+      'Authorization', 'Bearer <secret key>'
     ),
     body := '{}'::jsonb
   );
