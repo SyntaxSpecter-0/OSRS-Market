@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useWatchlistFlips } from '@/hooks/useWatchlistFlips';
+import { useAlertRules } from '@/hooks/useAlertRules';
 import { AddItemSearch } from '@/components/AddItemSearch';
 import { FlipTable } from '@/components/FlipTable';
 import { AlertRuleForm } from '@/components/AlertRuleForm';
@@ -14,7 +15,8 @@ import { enablePushNotifications } from '@/lib/firebase/push';
 export default function DashboardPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const { flips, removeFromWatchlist } = useWatchlistFlips(user?.id);
+  const { flips, addToWatchlist, removeFromWatchlist } = useWatchlistFlips(user?.id);
+  const { rules, addRule, removeRule } = useAlertRules(user?.id);
 
   useEffect(() => {
     if (!loading && !user) router.replace('/');
@@ -50,14 +52,11 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Single column on mobile/tablet; a fixed-width sidebar plus a
-          flexible table area from the lg breakpoint up, so wide desktop
-          screens actually get used instead of a narrow centered column. */}
       <div className="lg:grid lg:grid-cols-[320px_1fr] lg:items-start lg:gap-6">
         <div className="mb-4 flex flex-col gap-4 lg:sticky lg:top-6 lg:mb-0">
-          <AddItemSearch uid={user.id} />
-          <AlertRuleForm uid={user.id} />
-          <AlertRulesList uid={user.id} />
+          <AddItemSearch onAdd={(item) => addToWatchlist({ id: item.id, name: item.name, buyLimit: item.buyLimit })} />
+          <AlertRuleForm onSave={addRule} />
+          <AlertRulesList rules={rules} onRemove={removeRule} />
         </div>
 
         <div className="osrs-panel overflow-x-auto px-4 py-3">

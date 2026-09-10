@@ -1,6 +1,6 @@
 'use client';
 
-import { useAlertRules, type AlertRule } from '@/hooks/useAlertRules';
+import type { AlertRule } from '@/hooks/useAlertRules';
 
 function describeRule(rule: AlertRule): string {
   const scope = rule.itemName ?? 'any watchlist item';
@@ -16,9 +16,13 @@ function describeRule(rule: AlertRule): string {
   }
 }
 
-export function AlertRulesList({ uid }: { uid: string }) {
-  const { rules, removeRule } = useAlertRules(uid);
-
+export function AlertRulesList({
+  rules,
+  onRemove,
+}: {
+  rules: AlertRule[];
+  onRemove: (id: number) => void;
+}) {
   if (rules.length === 0) return null;
 
   return (
@@ -29,7 +33,7 @@ export function AlertRulesList({ uid }: { uid: string }) {
           <li key={rule.id} className="flex items-center justify-between text-sm text-ledger-parchment">
             <span>{describeRule(rule)}</span>
             <button
-              onClick={() => removeRule(rule.id)}
+              onClick={() => onRemove(rule.id)}
               className="text-ledger-muted hover:text-sell"
               aria-label="Remove this alert rule"
             >

@@ -13,10 +13,10 @@ export interface AlertRule {
 }
 
 /**
- * Loads the user's alert rules and subscribes to Realtime INSERT/DELETE on
- * alert_rules (filtered to this user), so saving or removing a rule shows
- * up immediately without a page refresh, the same pattern used for the
- * watchlist in useWatchlistFlips.
+ * Loads the user's alert rules and exposes addRule/removeRule that update
+ * local state immediately on success. Also subscribes to Realtime for
+ * cross-tab/device sync, but (as with useWatchlistFlips) actions taken in
+ * THIS tab no longer depend on that subscription actually delivering.
  */
 export function useAlertRules(uid: string | undefined) {
   const supabase = createClient();
@@ -43,14 +43,17 @@ export function useAlertRules(uid: string | undefined) {
         'postgres_changes',
         { event: 'INSERT', schema: 'public', table: 'alert_rules', filter: `user_id=eq.${uid}` },
         async (payload) => {
-          // Re-fetch just this row with its item name joined in, simplest
-          // way to get the join without hand-rolling a second query shape.
+          setRules((prev) => {
+            if (prev.some((r) => r.id === payload.new.id)) return prev; // already added locally
+            return prev;
+          });
           const { data } = await supabase
             .from('alert_rules')
             .select('id, item_id, rule_type, threshold, enabled, items ( name )')
             .eq('id', payload.new.id)
             .maybeSingle();
-          if (data) setRules((prev) => [toAlertRule(data), ...prev]);
+          if (!data) return;
+          setRules((prev) => (prev.some((r) => r.id === data.id) ? prev : [toAlertRule(data), ...prev]));
         }
       )
       .on(
@@ -69,12 +72,26 @@ export function useAlertRules(uid: string | undefined) {
     };
   }, [uid, supabase]);
 
-  async function removeRule(id: number) {
-    await supabase.from('alert_rules').delete().eq('id', id);
-    // No local state update here, the DELETE Realtime event above handles it.
+  async function addRule(threshold: number) {
+    if (!uid) return;
+    const { data, error } = await supabase
+      .from('alert_rules')
+      .insert({ user_id: uid, item_id: null, rule_type: 'margin_pct', threshold, enabled: true })
+      .select('id, item_id, rule_type, threshold, enabled, items ( name )')
+      .single();
+    if (error) throw error;
+
+    setRules((prev) => [toAlertRule(data), ...prev]);
   }
 
-  return { rules, removeRule };
+  async function removeRule(id: number) {
+    const { error } = await supabase.from('alert_rules').delete().eq('id', id);
+    if (error) throw error;
+
+    setRules((prev) => prev.filter((r) => r.id !== id));
+  }
+
+  return { rules, addRule, removeRule };
 }
 
 function toAlertRule(row: any): AlertRule {

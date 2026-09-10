@@ -1,10 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { searchItemsByName, type ItemSearchResult } from '@/lib/supabase/itemSearch';
 
-export function AddItemSearch({ uid }: { uid: string }) {
+export function AddItemSearch({
+  onAdd,
+}: {
+  onAdd: (item: ItemSearchResult) => Promise<void>;
+}) {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<ItemSearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -23,12 +26,8 @@ export function AddItemSearch({ uid }: { uid: string }) {
     setSearching(false);
   }
 
-  async function addToWatchlist(item: ItemSearchResult) {
-    const supabase = createClient();
-    await supabase.from('watchlist_items').upsert(
-      { user_id: uid, item_id: item.id },
-      { onConflict: 'user_id,item_id' }
-    );
+  async function handleAdd(item: ItemSearchResult) {
+    await onAdd(item);
     // Replace the dropdown with a brief confirmation instead of instantly
     // wiping the box, then clear for the next search shortly after.
     setResults([]);
@@ -58,7 +57,7 @@ export function AddItemSearch({ uid }: { uid: string }) {
           {results.map((item) => (
             <li key={item.id}>
               <button
-                onClick={() => addToWatchlist(item)}
+                onClick={() => handleAdd(item)}
                 className="flex w-full items-center justify-between px-3 py-2 text-left text-sm text-ledger-parchment hover:bg-ledger-line"
               >
                 <span>{item.name}</span>

@@ -17,13 +17,13 @@ export interface WatchedFlip {
 
 /**
  * Loads the user's watchlist, joins in each item's most recent price tick,
- * and subscribes to Supabase Realtime on two tables:
- *   - price_ticks: so numbers update live as the poller writes new ticks
- *   - watchlist_items (filtered to this user): so adding/removing an item
- *     from another tab, device, or component shows up immediately, with
- *     no page refresh needed
- * Realtime must be enabled on BOTH tables in the Supabase dashboard
- * (Database -> Replication) for this to work.
+ * and exposes addToWatchlist/removeFromWatchlist that update local state
+ * immediately (optimistically) on success rather than waiting for a
+ * Realtime echo of the write. Realtime subscriptions are still kept below
+ * for price ticks (so numbers update live) and for watchlist_items (so a
+ * change from another tab/device also shows up here) — but the primary
+ * add/remove flow triggered from THIS tab no longer depends on Realtime
+ * actually working.
  */
 export function useWatchlistFlips(uid: string | undefined) {
   const supabase = createClient();
@@ -97,9 +97,8 @@ export function useWatchlistFlips(uid: string | undefined) {
       )
       .subscribe();
 
-    // Reacts to this user's own watchlist changing, from this tab, another
-    // tab, or another device, so a newly-added item appears without a
-    // manual page refresh.
+    // Cross-tab/device sync only — the add/remove functions below already
+    // update local state directly for actions taken in THIS tab.
     const watchlistChannel = supabase
       .channel(`watchlist-live-${uid}`)
       .on(
@@ -107,10 +106,14 @@ export function useWatchlistFlips(uid: string | undefined) {
         { event: 'INSERT', schema: 'public', table: 'watchlist_items', filter: `user_id=eq.${uid}` },
         async (payload) => {
           const itemId = payload.new.item_id as number;
+          setFlips((prev) => {
+            if (itemId in prev) return prev; // already added locally, avoid a redundant fetch
+            return prev;
+          });
           const [meta, tick] = await Promise.all([loadItemMeta(itemId), loadLatestTick(itemId)]);
           setFlips((prev) => ({
             ...prev,
-            [itemId]: buildFlip(itemId, meta?.name ?? '…', meta?.buy_limit ?? 0, tick),
+            [itemId]: prev[itemId] ?? buildFlip(itemId, meta?.name ?? '…', meta?.buy_limit ?? 0, tick),
           }));
         }
       )
@@ -120,6 +123,7 @@ export function useWatchlistFlips(uid: string | undefined) {
         (payload) => {
           const itemId = payload.old.item_id as number;
           setFlips((prev) => {
+            if (!(itemId in prev)) return prev;
             const next = { ...prev };
             delete next[itemId];
             return next;
@@ -135,14 +139,38 @@ export function useWatchlistFlips(uid: string | undefined) {
     };
   }, [uid, supabase, loadLatestTick, loadItemMeta]);
 
-  async function removeFromWatchlist(itemId: number) {
+  async function addToWatchlist(item: { id: number; name: string; buyLimit: number }) {
     if (!uid) return;
-    await supabase.from('watchlist_items').delete().eq('user_id', uid).eq('item_id', itemId);
-    // No local state update needed here, the DELETE Realtime event above
-    // will remove it from state once Supabase confirms the delete.
+    const { error } = await supabase
+      .from('watchlist_items')
+      .upsert({ user_id: uid, item_id: item.id }, { onConflict: 'user_id,item_id' });
+    if (error) throw error;
+
+    // Update local state right away rather than waiting for Realtime.
+    const tick = await loadLatestTick(item.id);
+    setFlips((prev) => ({
+      ...prev,
+      [item.id]: buildFlip(item.id, item.name, item.buyLimit, tick),
+    }));
   }
 
-  return { flips: Object.values(flips), removeFromWatchlist };
+  async function removeFromWatchlist(itemId: number) {
+    if (!uid) return;
+    const { error } = await supabase
+      .from('watchlist_items')
+      .delete()
+      .eq('user_id', uid)
+      .eq('item_id', itemId);
+    if (error) throw error;
+
+    setFlips((prev) => {
+      const next = { ...prev };
+      delete next[itemId];
+      return next;
+    });
+  }
+
+  return { flips: Object.values(flips), addToWatchlist, removeFromWatchlist };
 }
 
 function buildFlip(

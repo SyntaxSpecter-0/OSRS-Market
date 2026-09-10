@@ -1,21 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 
-export function AlertRuleForm({ uid }: { uid: string }) {
+export function AlertRuleForm({ onSave }: { onSave: (threshold: number) => Promise<void> }) {
   const [threshold, setThreshold] = useState(5);
   const [saved, setSaved] = useState(false);
 
   async function handleSave() {
-    const supabase = createClient();
-    await supabase.from('alert_rules').insert({
-      user_id: uid,
-      item_id: null, // applies to anything on the watchlist
-      rule_type: 'margin_pct',
-      threshold,
-      enabled: true,
-    });
+    await onSave(threshold);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   }

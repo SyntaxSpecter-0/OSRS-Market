@@ -101,10 +101,10 @@ select cron.schedule(
   '* * * * *',
   $$
   select net.http_post(
-    url := 'https://<project>.supabase.co/functions/v1/poll-prices',
+    url := 'https://<PROJECT_REF>.supabase.co/functions/v1/poll-prices',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer <secret key>'
+      'Authorization', 'Bearer <SERVICE_ROLE_KEY>'
     ),
     body := '{}'::jsonb
   );
@@ -117,10 +117,10 @@ select cron.schedule(
   '0 3 * * *',
   $$
   select net.http_post(
-    url := 'https://<project>.supabase.co/functions/v1/refresh-mapping',
+    url := 'https://<PROJECT_REF>.supabase.co/functions/v1/refresh-mapping',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer <secret key>'
+      'Authorization', 'Bearer <SERVICE_ROLE_KEY>'
     ),
     body := '{}'::jsonb
   );
